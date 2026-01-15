@@ -1,0 +1,109 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore SecretsFinder.sln
+
+    - name: Build x64
+      run: msbuild SecretsFinder.sln /p:Configuration=Release /p:Platform=x64 /t:Rebuild
+
+    - name: Build x86
+      run: msbuild SecretsFinder.sln /p:Configuration=Release /p:Platform=x86 /t:Rebuild
+
+    - name: Create release folders
+      run: |
+        mkdir -p release/x64/SecretsFinder
+        mkdir -p release/x86/SecretsFinder
+        cp bin/Release-x64/SecretsFinder.dll release/x64/SecretsFinder/
+        cp bin/Release/SecretsFinder.dll release/x86/SecretsFinder/
+      shell: bash
+
+    - name: Create ZIP archives
+      run: |
+        cd release/x64
+        7z a -tzip ../../SecretsFinder_x64.zip SecretsFinder/
+        cd ../x86
+        7z a -tzip ../../SecretsFinder_x86.zip SecretsFinder/
+      shell: bash
+
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    - name: Upload x64 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SecretsFinder_x64
+        path: SecretsFinder_x64.zip
+
+    - name: Upload x86 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SecretsFinder_x86
+        path: SecretsFinder_x86.zip
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      with:
+        tag_name: ${{ steps.get_version.outputs.VERSION }}
+        name: SecretsFinder ${{ steps.get_version.outputs.VERSION }}
+        body: |
+          ## SecretsFinder ${{ steps.get_version.outputs.VERSION }}
+
+          Notepad++ plugin for detecting secrets, API keys, and credentials in documents.
+
+          ### Installation
+
+          1. Download the ZIP for your Notepad++ version:
+             - **64-bit Notepad++**: `SecretsFinder_x64.zip`
+             - **32-bit Notepad++**: `SecretsFinder_x86.zip`
+
+          2. Extract and copy `SecretsFinder.dll` to:
+             - 64-bit: `C:\Program Files\Notepad++\plugins\SecretsFinder\`
+             - 32-bit: `C:\Program Files (x86)\Notepad++\plugins\SecretsFinder\`
+
+          3. Restart Notepad++
+
+          ### Usage
+
+          Press `Ctrl+Alt+S` to scan the current document for secrets.
+
+          See [README](https://github.com/${{ github.repository }}/blob/main/README.md) for full documentation.
+        files: |
+          SecretsFinder_x64.zip
+          SecretsFinder_x86.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
