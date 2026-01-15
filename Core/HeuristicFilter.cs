@@ -52,8 +52,8 @@ namespace SecretsFinder.Core
 
             string trimmed = value.Trim('"', '\'', '`');
 
-            // Very short strings are noise.
-            if (trimmed.Length < 20)
+            // Very short strings are noise; allow 16+ for high-entropy tokens.
+            if (trimmed.Length < 16)
                 return true;
 
             // Obvious config/paths or common tokens.
@@ -64,11 +64,11 @@ namespace SecretsFinder.Core
                 return true;
 
             var classCount = CountCharClasses(trimmed);
-            if (classCount < 2)
+            if (classCount < 3)
                 return true;
 
-            // Raise entropy bar for high-entropy detections.
-            if (!LooksRandomEnough(trimmed, threshold: 3.8))
+            // Entropy threshold tuned to keep strong random tokens.
+            if (!LooksRandomEnough(trimmed, threshold: 3.5))
                 return true;
 
             return false;
@@ -100,7 +100,7 @@ namespace SecretsFinder.Core
             {
                 "subscription", "resource", "group", "account", "contentlength", "properties",
                 "centralindia", "administrator", "deployment", "storage", "blob", "keyvault",
-                "rg-", "tf-", "wireguard", "github", "azure", "container"
+                "wireguard", "github", "azure", "container"
             };
             foreach (var t in noiseTokens)
             {

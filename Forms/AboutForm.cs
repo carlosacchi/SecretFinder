@@ -11,6 +11,8 @@ namespace SecretsFinder.Forms
         private Label TitleLabel;
         private Label VersionLabel;
         private Label DescriptionLabel;
+        private Label CreditsLabel;
+        private Label DisclaimerLabel;
         private LinkLabel GitHubLinkLabel;
         private Button CloseButton;
 
@@ -25,6 +27,8 @@ namespace SecretsFinder.Forms
             this.TitleLabel = new Label();
             this.VersionLabel = new Label();
             this.DescriptionLabel = new Label();
+            this.CreditsLabel = new Label();
+            this.DisclaimerLabel = new Label();
             this.GitHubLinkLabel = new LinkLabel();
             this.CloseButton = new Button();
 
@@ -41,7 +45,7 @@ namespace SecretsFinder.Forms
             this.VersionLabel.AutoSize = true;
             this.VersionLabel.Location = new Point(22, 50);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Text = "Version 1.0.6";
+            this.VersionLabel.Text = "Version 1.0.8";
             this.VersionLabel.ForeColor = Color.Gray;
 
             // DescriptionLabel
@@ -51,16 +55,29 @@ namespace SecretsFinder.Forms
             this.DescriptionLabel.Text = "A Notepad++ plugin for detecting secrets, API keys, tokens, and other sensitive information in your documents.\n\n" +
                 "Helps prevent accidental exposure of credentials in backups, shared folders, and version control.";
 
+            // CreditsLabel
+            this.CreditsLabel.AutoSize = true;
+            this.CreditsLabel.Location = new Point(22, 170);
+            this.CreditsLabel.Name = "CreditsLabel";
+            this.CreditsLabel.Text = "Credits: Carlos Sacchi";
+
+            // DisclaimerLabel
+            this.DisclaimerLabel.Location = new Point(22, 190);
+            this.DisclaimerLabel.Name = "DisclaimerLabel";
+            this.DisclaimerLabel.Size = new Size(300, 40);
+            this.DisclaimerLabel.Text = "Disclaimer: automated scans help but cannot guarantee 100% detection. Combine with manual review.";
+            this.DisclaimerLabel.ForeColor = Color.Gray;
+
             // GitHubLinkLabel
             this.GitHubLinkLabel.AutoSize = true;
-            this.GitHubLinkLabel.Location = new Point(22, 170);
+            this.GitHubLinkLabel.Location = new Point(22, 235);
             this.GitHubLinkLabel.Name = "GitHubLinkLabel";
             this.GitHubLinkLabel.Text = "GitHub Repository";
             this.GitHubLinkLabel.LinkClicked += GitHubLinkLabel_LinkClicked;
 
             // CloseButton
             this.CloseButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.CloseButton.Location = new Point(250, 200);
+            this.CloseButton.Location = new Point(250, 265);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new Size(75, 25);
             this.CloseButton.Text = "Close";
@@ -70,10 +87,12 @@ namespace SecretsFinder.Forms
             // AboutForm
             this.AutoScaleDimensions = new SizeF(6F, 13F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(340, 240);
+            this.ClientSize = new Size(340, 300);
             this.Controls.Add(this.TitleLabel);
             this.Controls.Add(this.VersionLabel);
             this.Controls.Add(this.DescriptionLabel);
+            this.Controls.Add(this.CreditsLabel);
+            this.Controls.Add(this.DisclaimerLabel);
             this.Controls.Add(this.GitHubLinkLabel);
             this.Controls.Add(this.CloseButton);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
