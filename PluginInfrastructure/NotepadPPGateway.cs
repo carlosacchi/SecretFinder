@@ -95,6 +95,16 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
             != 0;
 
         /// <summary>
+        /// Activate (switch to) an already-open file in Notepad++ by its path.
+        /// </summary>
+        /// <param name="path">The path to the file to activate.</param>
+        /// <returns>True on success.</returns>
+        public bool ActivateFile(string path)
+            => Win32.SendMessage(
+                PluginBase.nppData._nppHandle, (uint) NppMsg.NPPM_SWITCHTOFILE, Unused, path).ToInt32()
+            != 0;
+
+        /// <summary>
         /// Gets the path of the current document.
         /// </summary>
         public unsafe string GetFilePath(IntPtr bufferId)
