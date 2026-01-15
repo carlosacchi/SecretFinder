@@ -145,6 +145,7 @@ namespace SecretsFinder.Utils
         [Description("Enable High Entropy String detection (potential secrets, may have false positives)"),
             Category("Generic Patterns"), DefaultValue(false)]
         public bool pattern_high_entropy_string { get; set; }
+[Description("Enable Simple Password detection (6+ alphanumeric chars)"),            Category("Generic Patterns"), DefaultValue(true)]        public bool pattern_simple_password { get; set; }
         #endregion
 
         #region CUSTOM_PATTERNS

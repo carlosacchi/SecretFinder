@@ -42,9 +42,9 @@ namespace SecretsFinder.Core
             new SecretPattern(
                 "aws_access_key",
                 "AWS Access Key",
-                @"AKIA[0-9A-Z]{16}",
+                @"AKIA[0-9A-Z]{16,128}",
                 SecretSeverity.High,
-                "AWS Access Key ID"
+                "AWS Access Key ID (16-128 chars)"
             ),
             new SecretPattern(
                 "aws_secret_key",
@@ -56,14 +56,14 @@ namespace SecretsFinder.Core
             new SecretPattern(
                 "github_token",
                 "GitHub Token",
-                @"gh[pousr]_[0-9a-zA-Z]{36}",
+                @"gh[pousr]_[0-9a-zA-Z]{36,}",
                 SecretSeverity.High,
                 "GitHub Personal Access Token"
             ),
             new SecretPattern(
                 "github_token_classic",
                 "GitHub Token (Classic)",
-                @"ghp_[0-9a-zA-Z]{36}",
+                @"ghp_[0-9a-zA-Z]{36,}",
                 SecretSeverity.High,
                 "GitHub Classic Personal Access Token"
             ),
@@ -229,11 +229,18 @@ namespace SecretsFinder.Core
                 "Azure GUID (Client ID, Secret ID, Tenant ID)"
             ),
             new SecretPattern(
+                "simple_password",
+                "Simple Password",
+                @"(?i)(password|passwd|pwd|pass|secret)[\s]*[=:][\s]*['\""]?([a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':\\|,.<>\/?]{6,})['\""]?",
+                SecretSeverity.Low,
+                "Simple password (6+ chars)"
+            ),
+            new SecretPattern(
                 "high_entropy_string",
                 "High Entropy String",
-                @"[a-zA-Z0-9~_\-]{20,}[a-zA-Z0-9]",
+                @"[a-zA-Z0-9+/~_\-\.]{12,}",
                 SecretSeverity.Low,
-                "Potential secret - high entropy string"
+                "High entropy string (12+ chars)"
             )
         };
     }
