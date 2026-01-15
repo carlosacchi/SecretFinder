@@ -2,34 +2,36 @@
 
 A Notepad++ plugin that detects secrets, API keys, tokens, and other sensitive information in your documents.
 
+[![Build and Release](https://github.com/carlosacchi/SecretFinder/actions/workflows/build-release.yml/badge.svg)](https://github.com/carlosacchi/SecretFinder/actions/workflows/build-release.yml)
+
+---
+
+## Download
+
+**[Download Latest Release](https://github.com/carlosacchi/SecretFinder/releases/latest)**
+
+- `SecretsFinder_x64.zip` - For 64-bit Notepad++ (most common)
+- `SecretsFinder_x86.zip` - For 32-bit Notepad++
+
 ---
 
 ## Quick Start
 
-### Step 1: Build the Plugin
+### Step 1: Download
 
-1. Open `SecretsFinder.sln` in **Visual Studio 2022** (or later)
-2. Select build configuration:
-   - **64-bit Notepad++** (most common): `Release | x64`
-   - **32-bit Notepad++**: `Release | x86`
-3. Build: `Ctrl+Shift+B`
+Go to [Releases](https://github.com/carlosacchi/SecretFinder/releases/latest) and download:
+- **64-bit Notepad++**: `SecretsFinder_x64.zip`
+- **32-bit Notepad++**: `SecretsFinder_x86.zip`
 
-### Step 2: Install the Plugin
+### Step 2: Install
 
-The build automatically copies the DLL to Notepad++. If it doesn't work:
-
-**Manual installation:**
-1. Find the built DLL:
-   - 64-bit: `bin\Release-x64\SecretsFinder.dll`
-   - 32-bit: `bin\Release\SecretsFinder.dll`
-
-2. Copy to Notepad++ plugins folder:
-   - 64-bit: `C:\Program Files\Notepad++\plugins\SecretsFinder\SecretsFinder.dll`
-   - 32-bit: `C:\Program Files (x86)\Notepad++\plugins\SecretsFinder\SecretsFinder.dll`
-
+1. Extract the ZIP file
+2. Copy `SecretsFinder.dll` to:
+   - 64-bit: `C:\Program Files\Notepad++\plugins\SecretsFinder\`
+   - 32-bit: `C:\Program Files (x86)\Notepad++\plugins\SecretsFinder\`
 3. **Restart Notepad++**
 
-### Step 3: Use the Plugin
+### Step 3: Use
 
 1. Open any file in Notepad++
 2. Press `Ctrl+Alt+S` to scan for secrets
@@ -163,6 +165,27 @@ Press `Ctrl+Alt+S` - all secrets should be highlighted!
 
 ---
 
+## Building from Source
+
+### Requirements
+- Visual Studio 2022 or later
+- .NET Framework 4.8 SDK
+
+### Build Steps
+
+1. Clone the repository
+2. Open `SecretsFinder.sln` in Visual Studio
+3. Select configuration:
+   - `Release | x64` for 64-bit
+   - `Release | x86` for 32-bit
+4. Build: `Ctrl+Shift+B`
+
+Output:
+- x64: `bin\Release-x64\SecretsFinder.dll`
+- x86: `bin\Release\SecretsFinder.dll`
+
+---
+
 ## Project Structure
 
 ```
@@ -182,18 +205,8 @@ SecretFinder/
 │   ├── Settings.cs            # Plugin settings
 │   └── Npp.cs                 # Notepad++ helpers
 ├── PluginInfrastructure/      # NPP plugin API
-├── Properties/
-│   └── AssemblyInfo.cs
-└── Dependencies/              # DllExport
+└── .github/workflows/         # CI/CD automation
 ```
-
----
-
-## Requirements
-
-- **Visual Studio 2022** or later
-- **.NET Framework 4.8** SDK
-- **Notepad++** 8.0 or later (64-bit recommended)
 
 ---
 
@@ -203,10 +216,6 @@ SecretFinder/
 - Make sure DLL is in correct folder: `plugins\SecretsFinder\SecretsFinder.dll`
 - Check Notepad++ architecture matches plugin (x64 vs x86)
 - Restart Notepad++ completely
-
-### Build errors
-- Ensure .NET Framework 4.8 SDK is installed
-- Restore NuGet packages: Right-click solution → Restore NuGet Packages
 
 ### Secrets not detected
 - Check if the pattern is enabled in Settings
