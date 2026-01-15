@@ -276,22 +276,40 @@ namespace SecretsFinder
             string[] openFiles = Npp.notepad.GetOpenFileNames();
             int filesScanned = 0;
 
+            // Remember current file to restore focus later
+            string originalFile = Npp.notepad.GetCurrentFilePath();
+
             foreach (string filePath in openFiles)
             {
                 try
                 {
-                    if (File.Exists(filePath))
-                    {
-                        string content = File.ReadAllText(filePath);
-                        var matches = scanner.ScanText(content, filePath);
-                        allMatches.AddRange(matches);
-                        filesScanned++;
-                    }
+                    // Activate each open buffer so we read the in-memory text (unsaved edits included)
+                    Npp.notepad.ActivateFile(filePath);
+                    Npp.editor = new ScintillaGateway(PluginBase.GetCurrentScintilla());
+
+                    string content = Npp.editor.GetText((int)Npp.editor.GetLength() + 1);
+                    if (string.IsNullOrEmpty(content))
+                        continue;
+
+                    var matches = scanner.ScanText(content, filePath);
+                    allMatches.AddRange(matches);
+                    filesScanned++;
                 }
                 catch
                 {
                     // Skip files that can't be read
                 }
+            }
+
+            // Restore original buffer focus
+            if (!string.IsNullOrEmpty(originalFile) && File.Exists(originalFile))
+            {
+                try
+                {
+                    Npp.notepad.ActivateFile(originalFile);
+                    Npp.editor = new ScintillaGateway(PluginBase.GetCurrentScintilla());
+                }
+                catch { }
             }
 
             currentMatches = allMatches;

@@ -27,6 +27,10 @@ namespace SecretsFinder.Utils
         [Description("Scan files larger than this size (in KB) - set to 0 for unlimited"),
             Category("Scanning"), DefaultValue(5000)]
         public int max_file_size_kb { get; set; }
+
+        [Description("Reduce false positives using heuristics (entropy + common-word filter)"),
+            Category("Scanning"), DefaultValue(true)]
+        public bool heuristic_filter_enabled { get; set; }
         #endregion
 
         #region PATTERNS_CLOUD

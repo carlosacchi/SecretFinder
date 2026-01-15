@@ -120,6 +120,7 @@ Access via **Plugins → SecretsFinder → Settings**
 - `auto_scan_on_open` - Automatically scan when files are opened
 - `show_auto_scan_notification` - Show popup when secrets found
 - `max_file_size_kb` - Skip files larger than this (0 = unlimited)
+- `heuristic_filter_enabled` - Reduce false positives for simple passwords by combining entropy check and common-word filtering (English-focused)
 
 ### Patterns
 Enable/disable individual pattern types:
