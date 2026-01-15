@@ -134,7 +134,15 @@ namespace SecretsFinder.Core
             // Only apply heuristics to generic/simple password-like patterns to avoid dropping structured keys.
             bool isPasswordish = pattern.Id == "simple_password" || pattern.Id == "connection_string_password" || pattern.Id == "generic_secret";
             if (!isPasswordish)
+            {
+                // Additionally, dampen high-entropy noise unless user disabled heuristic filter.
+                if (pattern.Id == "high_entropy_string" && SecretsFinder.Main.settings.heuristic_filter_enabled)
+                {
+                    if (HeuristicFilter.ShouldDropHighEntropy(value))
+                        return true;
+                }
                 return false;
+            }
 
             // Heuristic filter toggle is driven by pattern.IsEnabled in settings copy: we piggyback on Id since settings carries only booleans.
             // If user disabled heuristic via settings, the caller should set pattern.IsEnabled accordingly before constructing the scanner.
