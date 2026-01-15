@@ -180,13 +180,22 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         public string[] GetOpenFileNames()
         {
             var bufs = new List<string>();
-            foreach (int view in GetVisibleViews())
+            
+            // Use ALL_OPEN_FILES (0) to get total count across all views
+            int totalOpenFiles = (int)Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETNBOPENFILES, 0, 0);
+            
+            // Get files from both views
+            for (int view = 0; view < 2; view++)
             {
                 int nbOpenFiles = (int)Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETNBOPENFILES, 0, view + 1);
                 for (int ii = 0; ii < nbOpenFiles; ii++)
                 {
                     IntPtr bufId = Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETBUFFERIDFROMPOS, ii, view);
-                    bufs.Add(Npp.notepad.GetFilePath(bufId));
+                    string filePath = Npp.notepad.GetFilePath(bufId);
+                    if (!string.IsNullOrEmpty(filePath) && !bufs.Contains(filePath))
+                    {
+                        bufs.Add(filePath);
+                    }
                 }
             }
             return bufs.ToArray();
