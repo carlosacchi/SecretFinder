@@ -217,7 +217,7 @@ namespace SecretsFinder.Core
             new SecretPattern(
                 "azure_client_secret",
                 "Azure Client Secret",
-                @"[a-zA-Z0-9~_\.\-]{34,40}",
+                @"[a-zA-Z0-9]{1,3}~[a-zA-Z0-9_.-]{30,}",
                 SecretSeverity.High,
                 "Azure/Entra ID Client Secret (app password)"
             ),
