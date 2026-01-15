@@ -218,6 +218,8 @@ SecretFinder/
 
 ## Troubleshooting
 
+> Disclaimer: SecretsFinder helps surface likely secrets, but no automated scanner can guarantee 100% detection or zero false positives. Always combine automated scans with manual review and your organization’s security processes.
+
 ### Plugin doesn't appear in menu
 - Make sure DLL is in correct folder: `plugins\SecretsFinder\SecretsFinder.dll`
 - Check Notepad++ architecture matches plugin (x64 vs x86)
