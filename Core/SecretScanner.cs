@@ -132,7 +132,7 @@ namespace SecretsFinder.Core
         private bool ShouldFilterMatch(SecretPattern pattern, string value)
         {
             // Only apply heuristics to generic/simple password-like patterns to avoid dropping structured keys.
-            bool isPasswordish = pattern.Id == "simple_password" || pattern.Id == "connection_string_password" || pattern.Id == "generic_secret";
+            bool isPasswordish = pattern.Id == "simple_password" || pattern.Id == "connection_string_password" || pattern.Id == "generic_secret" || pattern.Id == "probable_password";
             if (!isPasswordish)
             {
                 // Additionally, dampen high-entropy noise unless user disabled heuristic filter.

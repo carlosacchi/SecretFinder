@@ -187,6 +187,13 @@ namespace SecretsFinder.Core
                 "Basic authentication credentials"
             ),
             new SecretPattern(
+                "probable_password",
+                "Probable Password (mixed case)",
+                @"(?=.{6,32}$)(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9!@#$%^&*()_+\-=/\\.,]{6,32}",
+                SecretSeverity.Low,
+                "Likely password: mixed case + digit, 6-32 chars"
+            ),
+            new SecretPattern(
                 "npm_token",
                 "NPM Token",
                 @"npm_[A-Za-z0-9]{36}",
