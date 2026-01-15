@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Kbg.NppPluginNET.PluginInfrastructure;
@@ -176,28 +177,91 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         /// <summary>
         /// Get all open filenames in both views (all in first view, then all in second view)
         /// </summary>
+        /// <param name="showDebugInfo">If true, displays debug information about the file enumeration</param>
         /// <returns></returns>
-        public string[] GetOpenFileNames()
+        public string[] GetOpenFileNames(bool showDebugInfo = false)
         {
             var bufs = new List<string>();
-            
+            var debugInfo = new System.Text.StringBuilder();
+
             // Use ALL_OPEN_FILES (0) to get total count across all views
-            int totalOpenFiles = (int)Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETNBOPENFILES, 0, 0);
-            
+            // NPPM_GETNBOPENFILES: wParam=0, lParam=0 returns total count
+            int totalOpenFiles = (int)Win32.SendMessage(
+                PluginBase.nppData._nppHandle,
+                (uint)NppMsg.NPPM_GETNBOPENFILES,
+                0,
+                (int)NppMsg.ALL_OPEN_FILES);
+
+            debugInfo.AppendLine($"Total open files (NPPM_GETNBOPENFILES with lParam=0): {totalOpenFiles}");
+            debugInfo.AppendLine();
+
             // Get files from both views
-            for (int view = 0; view < 2; view++)
+            // PRIMARY_VIEW = 1, SECOND_VIEW = 2
+            for (int viewLParam = (int)NppMsg.PRIMARY_VIEW; viewLParam <= (int)NppMsg.SECOND_VIEW; viewLParam++)
             {
-                int nbOpenFiles = (int)Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETNBOPENFILES, 0, view + 1);
-                for (int ii = 0; ii < nbOpenFiles; ii++)
+                // NPPM_GETNBOPENFILES: wParam=0, lParam=view (1 or 2)
+                int nbOpenFiles = (int)Win32.SendMessage(
+                    PluginBase.nppData._nppHandle,
+                    (uint)NppMsg.NPPM_GETNBOPENFILES,
+                    0,
+                    viewLParam);
+
+                string viewName = viewLParam == (int)NppMsg.PRIMARY_VIEW ? "PRIMARY" : "SECONDARY";
+                debugInfo.AppendLine($"{viewName} VIEW (lParam={viewLParam}): {nbOpenFiles} files");
+
+                // The view index for NPPM_GETBUFFERIDFROMPOS is 0-based (0 or 1)
+                // but NPPM_GETNBOPENFILES uses 1-based (1 or 2)
+                int viewIndex = viewLParam - 1;
+
+                for (int docIndex = 0; docIndex < nbOpenFiles; docIndex++)
                 {
-                    IntPtr bufId = Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETBUFFERIDFROMPOS, ii, view);
-                    string filePath = Npp.notepad.GetFilePath(bufId);
-                    if (!string.IsNullOrEmpty(filePath) && !bufs.Contains(filePath))
+                    // NPPM_GETBUFFERIDFROMPOS: wParam=docIndex, lParam=viewIndex (0 or 1)
+                    IntPtr bufId = Win32.SendMessage(
+                        PluginBase.nppData._nppHandle,
+                        (uint)NppMsg.NPPM_GETBUFFERIDFROMPOS,
+                        docIndex,
+                        viewIndex);
+
+                    // Skip invalid buffer IDs
+                    if (bufId == IntPtr.Zero)
+                    {
+                        debugInfo.AppendLine($"  [{docIndex}] NULL buffer ID (skipped)");
+                        continue;
+                    }
+
+                    string filePath = GetFilePath(bufId);
+
+                    if (string.IsNullOrEmpty(filePath))
+                    {
+                        debugInfo.AppendLine($"  [{docIndex}] bufId={bufId} - Empty/null path (skipped)");
+                        continue;
+                    }
+
+                    bool isDuplicate = bufs.Contains(filePath);
+                    if (!isDuplicate)
                     {
                         bufs.Add(filePath);
+                        debugInfo.AppendLine($"  [{docIndex}] {Path.GetFileName(filePath)}");
+                    }
+                    else
+                    {
+                        debugInfo.AppendLine($"  [{docIndex}] {Path.GetFileName(filePath)} (duplicate, skipped)");
                     }
                 }
+                debugInfo.AppendLine();
             }
+
+            debugInfo.AppendLine($"TOTAL UNIQUE FILES FOUND: {bufs.Count}");
+
+            if (showDebugInfo)
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    debugInfo.ToString(),
+                    "GetOpenFileNames Debug Info",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Information);
+            }
+
             return bufs.ToArray();
         }
 

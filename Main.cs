@@ -64,6 +64,9 @@ namespace SecretsFinder
             PluginBase.SetCommand(7, "&About", ShowAboutForm);
             IdAbout = 7;
 
+            PluginBase.SetCommand(8, "Debug: Show &Open Files", ShowOpenFilesDebug);
+            // This debug command shows detailed information about file enumeration
+
             // Initialize indicator
             indicatorManager.Initialize();
             indicatorManager.SetupIndicatorStyle(settings.GetHighlightColor());
@@ -426,6 +429,12 @@ namespace SecretsFinder
             {
                 aboutForm.ShowDialog();
             }
+        }
+
+        public static void ShowOpenFilesDebug()
+        {
+            // Call GetOpenFileNames with debug info enabled
+            Npp.notepad.GetOpenFileNames(showDebugInfo: true);
         }
 
         public static void RestyleEverything()
