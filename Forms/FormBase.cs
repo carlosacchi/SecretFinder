@@ -69,7 +69,7 @@ namespace SecretsFinder.Forms
             //     because it must be called *after* the subclass constructor adds all child controls
             //     and the base constructor must be called first (that's just how C# works)
             AddKeyUpDownPressHandlers(this);
-            Translator.TranslateForm(this);
+            // Translation disabled
             FormStyle.ApplyStyle(this, Main.settings.use_npp_styling);
         }
 

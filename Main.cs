@@ -180,7 +180,7 @@ namespace SecretsFinder
 
         public static void ScanCurrentDocument()
         {
-            string text = Npp.editor.GetText(Npp.editor.GetLength() + 1);
+            string text = Npp.editor.GetText((int)Npp.editor.GetLength() + 1);
             if (string.IsNullOrEmpty(text))
             {
                 MessageBox.Show("No text to scan in current document.",
@@ -227,7 +227,7 @@ namespace SecretsFinder
         {
             try
             {
-                string text = Npp.editor.GetText(Npp.editor.GetLength() + 1);
+                string text = Npp.editor.GetText((int)Npp.editor.GetLength() + 1);
                 if (string.IsNullOrEmpty(text))
                     return;
 

@@ -1,6 +1,5 @@
-﻿/*
+/*
 Utilities for storing, viewing, and updating the settings of the plugin.
-Modified from https://raw.githubusercontent.com/BdR76/CSVLint/master/CSVLintNppPlugin/PluginInfrastructure/SettingsBase.cs
 */
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using SecretsFinder;
 using SecretsFinder.Utils;
 using Kbg.NppPluginNET.PluginInfrastructure;
 using System.Reflection;
@@ -52,10 +52,7 @@ namespace CsvQuery.PluginInfrastructure
         }
 
         /// <summary>
-        /// things to do whenever the settings are changed by using the dialog<br></br>
-        /// The main thing to always do is save settings to the {PluginName}.ini file.<br></br>
-        /// override this in your Settings.cs as desired,
-        /// but make sure to call base.OnSettingsChanged() in the override.
+        /// things to do whenever the settings are changed by using the dialog
         /// </summary>
         public virtual void OnSettingsChanged()
         {
@@ -65,7 +62,6 @@ namespace CsvQuery.PluginInfrastructure
         /// <summary>
         /// By default loads settings from the default N++ config folder
         /// </summary>
-        /// <param name="loadFromFile"> If false will not load anything and have default values set </param>
         public SettingsBase(bool loadFromFile = true)
         {
             // Set defaults
@@ -83,22 +79,17 @@ namespace CsvQuery.PluginInfrastructure
         /// <summary>
         /// Reads all (existing) settings from an ini-file
         /// </summary>
-        /// <param name="filename">File to write to (default is N++ plugin config)</param>
-        /// <returns>False if the file did not exist, or if not all values in the file were valid.<br></br>
-        /// True otherwise.</returns>
         public bool ReadFromIniFile(string filename = null)
         {
             filename = filename ?? IniFilePath;
             if (!File.Exists(filename))
                 return false;
 
-            // Load all sections from file
             var loaded = GetType().GetProperties()
                 .Select(x => ((CategoryAttribute)x.GetCustomAttributes(typeof(CategoryAttribute), false).FirstOrDefault())?.Category ?? "General")
                 .Distinct()
                 .ToDictionary(section => section, section => GetKeys(filename, section));
 
-            //var loaded = GetKeys(filename, "General");
             bool allConvertedCorrectly = true;
             foreach (var propertyInfo in GetType().GetProperties())
             {
@@ -109,7 +100,6 @@ namespace CsvQuery.PluginInfrastructure
                     var rawString = loaded[category][name];
                     var converter = TypeDescriptor.GetConverter(propertyInfo.PropertyType);
                     bool convertedCorrectly = false;
-                    Exception ex = null;
                     if (converter.IsValid(rawString))
                     {
                         try
@@ -117,50 +107,21 @@ namespace CsvQuery.PluginInfrastructure
                             propertyInfo.SetValue(this, converter.ConvertFromInvariantString(rawString), null);
                             convertedCorrectly = true;
                         }
-                        catch (Exception ex_)
+                        catch
                         {
-                            ex = ex_;
+                            // Conversion failed, use default
                         }
                     }
                     if (!convertedCorrectly)
                     {
                         allConvertedCorrectly = false;
-                        // use the default value for the property, since the config file couldn't be read in this case.
                         SetPropertyInfoToDefault(propertyInfo);
-                        if (!Translator.HasTranslations)
-                            Translator.ResetTranslations(!Translator.HasLoadedAtStartup);
-                        if (ex is null)
-                        {
-                            Translator.ShowTranslatedMessageBox(
-                                "While parsing $PluginName$ config file, expected setting \"{0}\" to be type {1}, but got an error.\r\nThat setting was set to its default value of {2}.\r\nThe given value {3} could not be converted for an unknown reason.",
-                                $"Unknown error while parsing {Main.PluginName} config file",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                4, name, propertyInfo.PropertyType.Name, propertyInfo.GetValue(this, null), rawString
-                            );
-                        }
-                        else
-                        {
-                            Translator.ShowTranslatedMessageBox(
-                                "While parsing $PluginName$ config file, expected setting \"{0}\" to be type {1}, but got an error.\r\nThat setting was set to its default value of {2}.\r\nThe given value {3} raised the following error:\r\n{4}",
-                                $"Error while parsing {Main.PluginName} config file",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                5, name, propertyInfo.PropertyType.Name, propertyInfo.GetValue(this, null), rawString, ex
-                            );
-                        }
                     }
                 }
             }
             return allConvertedCorrectly;
         }
 
-        /// <summary>
-        /// if the PropertyInfo does not have a default value, return false.<br></br>
-        /// Otherwise, set the PropertyInfo's value for this object to the default value, and return true.
-        /// </summary>
-        /// <param name="propertyInfo"></param>
-        /// <returns></returns>
         private bool SetPropertyInfoToDefault(PropertyInfo propertyInfo)
         {
             if (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() is DefaultValueAttribute def)
@@ -172,15 +133,13 @@ namespace CsvQuery.PluginInfrastructure
         }
 
         /// <summary>
-        /// Saves all settings to an ini-file, under "General" section
+        /// Saves all settings to an ini-file
         /// </summary>
-        /// <param name="filename">File to write to (default is N++ plugin config)</param>
         public void SaveToIniFile(string filename = null)
         {
             filename = filename ?? IniFilePath;
             Npp.CreateConfigSubDirectoryIfNotExists();
 
-            // Win32.WritePrivateProfileSection (that NppPlugin uses) doesn't work well with non-ASCII characters. So we roll our own.
             using (var fp = new StreamWriter(filename, false, Encoding.UTF8))
             {
                 fp.WriteLine("; {0} settings file", Main.PluginName);
@@ -193,7 +152,8 @@ namespace CsvQuery.PluginInfrastructure
                     fp.WriteLine(Environment.NewLine + "[{0}]", section.Key);
                     foreach (var propertyInfo in section.OrderBy(x => x.Name))
                     {
-                        string description = Translator.TranslateSettingsDescription(propertyInfo);
+                        var desc = (DescriptionAttribute)propertyInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault();
+                        string description = desc?.Description ?? propertyInfo.Name;
                         fp.WriteLine("; " + description.Replace(Environment.NewLine, Environment.NewLine + "; "));
                         var converter = TypeDescriptor.GetConverter(propertyInfo.PropertyType);
                         fp.WriteLine("{0}={1}", propertyInfo.Name, converter.ConvertToInvariantString(propertyInfo.GetValue(this, null)));
@@ -202,15 +162,9 @@ namespace CsvQuery.PluginInfrastructure
             }
         }
 
-        /// <summary>
-        /// Read a section from an ini-file
-        /// </summary>
-        /// <param name="iniFile">Path to ini-file</param>
-        /// <param name="category">Section to read</param>
         private Dictionary<string, string> GetKeys(string iniFile, string category)
         {
             var buffer = new byte[8 * 1024];
-
             Win32.GetPrivateProfileSection(category, buffer, buffer.Length, iniFile);
             var tmp = Encoding.UTF8.GetString(buffer).Trim('\0').Split('\0');
             return tmp.Select(x => x.Split(new[] { '=' }, 2))
@@ -223,23 +177,12 @@ namespace CsvQuery.PluginInfrastructure
         /// </summary>
         public void ShowDialog(bool debug = false)
         {
-            // We bind a copy of this object and only apply it after they click "Ok"
             var copy = (Settings)MemberwiseClone();
-
-            //// check the current settings
-            //var settingsSb = new StringBuilder();
-            //foreach (System.Reflection.PropertyInfo p in GetType().GetProperties())
-            //{
-            //    settingsSb.Append(p.ToString());
-            //    settingsSb.Append($": {p.GetValue(this)}");
-            //    settingsSb.Append(", ");
-            //}
-            //MessageBox.Show(settingsSb.ToString());
 
             var dialog = new Form
             {
                 Name = "SettingsForm",
-                Text = $"Settings - {Main.PluginName} plug-in",
+                Text = $"Settings - {Main.PluginName}",
                 ClientSize = new Size(DEFAULT_WIDTH, DEFAULT_HEIGHT),
                 MinimumSize = new Size(250, 250),
                 ShowIcon = false,
@@ -283,17 +226,15 @@ namespace CsvQuery.PluginInfrastructure
                         Location = new Point(13, 13),
                         Size = new Size(DEFAULT_WIDTH - 13 - 13, DEFAULT_HEIGHT - 55),
                         AutoScaleMode = AutoScaleMode.Font,
-                        AutoScaleDimensions = new SizeF(6F,13F),
+                        AutoScaleDimensions = new SizeF(6F, 13F),
                         SelectedObject = copy
                     },
                 }
             };
-            Translator.TranslateForm(dialog);
 
             dialog.Controls["Cancel"].Click += (a, b) => dialog.Close();
             dialog.Controls["Ok"].Click += (a, b) =>
             {
-                // change the settings to whatever the user selected
                 var changesEventArgs = new SettingsChangedEventArgs((Settings)this, copy);
                 if (!changesEventArgs.Changed.Any())
                 {
@@ -312,11 +253,10 @@ namespace CsvQuery.PluginInfrastructure
                         }
                         catch (Exception ex)
                         {
-                            Translator.ShowTranslatedMessageBox(
-                                "Could not change setting {0} to value {1}, so it will remain set as {2}.\r\nGot the following exception:\r\n{3}",
-                                "Invalid value for setting {0}",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error,
-                                4, propertyInfo.Name, newValue, oldValue, ex, propertyInfo.Name);
+                            MessageBox.Show(
+                                $"Could not change setting {propertyInfo.Name} to value {newValue}.\r\n{ex.Message}",
+                                "Invalid Setting",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
@@ -325,7 +265,6 @@ namespace CsvQuery.PluginInfrastructure
             };
             dialog.Controls["Reset"].Click += (a, b) =>
             {
-                // reset the settings to defaults
                 foreach (var propertyInfo in GetType().GetProperties())
                 {
                     SetPropertyInfoToDefault(propertyInfo);
@@ -333,7 +272,7 @@ namespace CsvQuery.PluginInfrastructure
                 OnSettingsChanged();
                 dialog.Close();
             };
-            // close dialog on pressing Escape (this doesn't work if a grid cell is selected, but it does work if a button is selected)
+
             KeyEventHandler keyDownHandler = (a, b) =>
             {
                 if (b.KeyCode == Keys.Escape)
@@ -342,31 +281,7 @@ namespace CsvQuery.PluginInfrastructure
             dialog.KeyDown += keyDownHandler;
             foreach (Control ctrl in dialog.Controls)
                 ctrl.KeyDown += keyDownHandler;
-            // translate the descriptions of the settings
-            var grid = dialog.Controls["Grid"];
-            if (Translator.HasTranslations
-                && grid.Controls.Count >= 1 && grid.Controls[0] is Control commentPane
-                && commentPane.Controls.Count >= 2 && commentPane.Controls[1] is Label descriptionLabel)
-            {
-                string translatedDescription = "";
-                var propGrid = (PropertyGrid)grid;
-                propGrid.SelectedGridItemChanged += (object _, SelectedGridItemChangedEventArgs e) =>
-                {
-                    GridItem selectedItem = e.NewSelection;
-                    PropertyDescriptor selectedPropertyDesc = selectedItem?.PropertyDescriptor;
-                    if (selectedPropertyDesc is null)
-                        return;
-                    PropertyInfo selectedProp = GetType().GetProperty(selectedPropertyDesc.Name);
-                    translatedDescription = Translator.TranslateSettingsDescription(selectedProp);
-                    if (translatedDescription.Length > 0)
-                        descriptionLabel.Text = translatedDescription;
-                };
-                commentPane.SizeChanged += (object _, EventArgs e) =>
-                {
-                    if (translatedDescription.Length > 0)
-                        descriptionLabel.Text = translatedDescription;
-                };
-            }
+
             dialog.ShowDialog();
         }
 

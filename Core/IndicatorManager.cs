@@ -41,8 +41,8 @@ namespace SecretsFinder.Core
             Npp.editor.IndicSetStyle(_indicatorId, IndicatorStyle.ROUNDBOX);
             Npp.editor.IndicSetFore(_indicatorId, new Colour(
                 highlightColor.R, highlightColor.G, highlightColor.B));
-            Npp.editor.IndicSetAlpha(_indicatorId, 100);
-            Npp.editor.IndicSetOutlineAlpha(_indicatorId, 255);
+            Npp.editor.IndicSetAlpha(_indicatorId, (Alpha)100);
+            Npp.editor.IndicSetOutlineAlpha(_indicatorId, Alpha.OPAQUE);
             Npp.editor.IndicSetUnder(_indicatorId, true);
         }
 
@@ -61,8 +61,7 @@ namespace SecretsFinder.Core
                 return;
 
             Npp.editor.SetIndicatorCurrent(_indicatorId);
-            int length = Npp.editor.GetLength();
-            if (length > 0)
+            if (Npp.editor.TryGetLengthAsInt(out int length) && length > 0)
             {
                 Npp.editor.IndicatorClearRange(0, length);
             }
