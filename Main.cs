@@ -478,18 +478,37 @@ namespace SecretsFinder
             string currentFile = Npp.notepad.GetCurrentFilePath();
             if (!string.Equals(currentFile, match.FilePath, StringComparison.OrdinalIgnoreCase))
             {
-                if (File.Exists(match.FilePath))
+                bool fileOpened = false;
+
+                // Strategy 1: Try to activate the file if it's already open (handles unsaved buffers)
+                // This works for files like "new 1", "BASIC TOOLS" that don't have file paths yet
+                if (!string.IsNullOrEmpty(match.FilePath))
                 {
-                    Npp.notepad.OpenFile(match.FilePath);
-                    // Reset editor after file change
-                    Npp.editor = new ScintillaGateway(PluginBase.GetCurrentScintilla());
+                    fileOpened = Npp.notepad.ActivateFile(match.FilePath);
                 }
-                else
+
+                // Strategy 2: If activation failed, try to open from disk (handles saved files)
+                if (!fileOpened && File.Exists(match.FilePath))
                 {
-                    MessageBox.Show($"File not found:\n{match.FilePath}",
-                        "SecretsFinder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    fileOpened = Npp.notepad.OpenFile(match.FilePath);
+                }
+
+                // If both strategies failed, show error
+                if (!fileOpened)
+                {
+                    string fileName = Path.GetFileName(match.FilePath);
+                    MessageBox.Show(
+                        $"Cannot navigate to file:\n\n{fileName}\n\n" +
+                        "The file may have been closed, deleted, or was an unsaved buffer that no longer exists.\n\n" +
+                        "Try scanning again to refresh the results.",
+                        "SecretsFinder - Navigation Failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
                     return;
                 }
+
+                // Reset editor after file change
+                Npp.editor = new ScintillaGateway(PluginBase.GetCurrentScintilla());
             }
 
             // Go to position and select
