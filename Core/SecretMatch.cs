@@ -7,6 +7,22 @@ namespace SecretsFinder.Core
     {
         public string FilePath { get; set; }
         public string FileName => string.IsNullOrEmpty(FilePath) ? "Unknown" : Path.GetFileName(FilePath);
+
+        public string DisplayPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(FilePath)) return FileName;
+                try
+                {
+                    return Path.GetFullPath(FilePath);
+                }
+                catch
+                {
+                    return FilePath;
+                }
+            }
+        }
         public int LineNumber { get; set; }
         public int StartPosition { get; set; }
         public int EndPosition { get; set; }

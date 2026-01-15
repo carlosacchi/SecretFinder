@@ -155,7 +155,7 @@ namespace SecretsFinder.Forms
             {
                 var item = new ListViewItem(new[]
                 {
-                    match.FileName,
+                    match.DisplayPath,
                     match.LineNumber.ToString(),
                     match.Pattern?.Name ?? "Unknown",
                     match.ObscuredValue,
