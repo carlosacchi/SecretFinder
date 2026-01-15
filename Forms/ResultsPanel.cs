@@ -69,7 +69,7 @@ namespace SecretsFinder.Forms
 
             // Column Headers
             this.FileColumn.Text = "File";
-            this.FileColumn.Width = 150;
+            this.FileColumn.Width = 260;
             this.LineColumn.Text = "Line";
             this.LineColumn.Width = 50;
             this.TypeColumn.Text = "Type";
@@ -162,23 +162,28 @@ namespace SecretsFinder.Forms
                     match.Pattern?.Severity.ToString() ?? "Unknown"
                 });
                 item.Tag = match;
+                item.ToolTipText = match.DisplayPath;
 
-                // Color code by severity
+                // Adjust severity display upward and recolor: Low->Medium (yellow), Medium->High (orange), High->Critical (red), Critical->Critical (purple)
                 if (match.Pattern != null)
                 {
-                    switch (match.Pattern.Severity)
+                    var severity = match.Pattern.Severity;
+                    switch (severity)
                     {
-                        case SecretSeverity.Critical:
-                            item.BackColor = Color.FromArgb(255, 200, 200);
-                            break;
-                        case SecretSeverity.High:
-                            item.BackColor = Color.FromArgb(255, 230, 200);
+                        case SecretSeverity.Low:
+                            item.SubItems[4].Text = SecretSeverity.Medium.ToString();
+                            item.BackColor = Color.FromArgb(255, 255, 200); // yellow
                             break;
                         case SecretSeverity.Medium:
-                            item.BackColor = Color.FromArgb(255, 255, 200);
+                            item.SubItems[4].Text = SecretSeverity.High.ToString();
+                            item.BackColor = Color.FromArgb(255, 200, 120); // orange
                             break;
-                        case SecretSeverity.Low:
-                            item.BackColor = Color.FromArgb(220, 255, 220);
+                        case SecretSeverity.High:
+                            item.SubItems[4].Text = SecretSeverity.Critical.ToString();
+                            item.BackColor = Color.FromArgb(255, 160, 160); // red-ish
+                            break;
+                        case SecretSeverity.Critical:
+                            item.BackColor = Color.FromArgb(200, 160, 255); // purple
                             break;
                     }
                 }

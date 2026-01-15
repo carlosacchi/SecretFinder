@@ -1,4 +1,5 @@
 name: Build and Release
+run-name: v1.0.11 - improve detection and navigation
 
 on:
   push:
