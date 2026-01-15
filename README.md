@@ -79,6 +79,8 @@ Go to [Releases](https://github.com/carlosacchi/SecretFinder/releases/latest) an
 | Google API Key | `AIzaSyC...` |
 | Azure Storage | `DefaultEndpointsProtocol=https;AccountName=...` |
 | Azure SAS Token | `?sig=...` |
+| Azure Client Secret | `8Q~xxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| Azure GUID | `12345678-1234-1234-1234-123456789abc` |
 | Firebase URL | `https://xxx.firebaseio.com` |
 | Heroku API Key | `heroku...UUID` |
 
@@ -106,6 +108,7 @@ Go to [Releases](https://github.com/carlosacchi/SecretFinder/releases/latest) an
 | Bearer Token | `Bearer eyJ...` |
 | Basic Auth | `Basic dXNlcjpwYXNz...` |
 | Generic API Key | `api_key = "..."` |
+| High Entropy String | `Random-looking 20+ char strings` (disabled by default) |
 
 ---
 
@@ -120,9 +123,9 @@ Access via **Plugins → SecretsFinder → Settings**
 
 ### Patterns
 Enable/disable individual pattern types:
-- Cloud: AWS, Google, Azure, Firebase, Heroku
-- Services: GitHub, Stripe, Slack, Discord, Twilio, SendGrid, etc.
-- Generic: JWT, Private Keys, Connection Strings, Bearer/Basic Auth
+- Cloud: AWS, Google, Azure (Storage, SAS, Client Secrets, GUIDs), Firebase, Heroku
+- Services: GitHub, Stripe, Slack, Discord, Twilio, SendGrid, Mailchimp, NPM, NuGet
+- Generic: JWT, Private Keys, Connection Strings, Bearer/Basic Auth, High Entropy Strings
 
 ### Display
 - `highlight_color` - Color for highlighting secrets (default: `#FF6B6B`)
@@ -152,10 +155,12 @@ InternalToken|INT_[a-f0-9]{64}|Critical
 Create a test file to verify the plugin works:
 
 ```
-# Test secrets - these are fake examples
+# Test secrets - these are fake examples for testing
 aws_key = AKIAIOSFODNN7EXAMPLE
-github_token = ghp_abcdefghijklmnopqrstuvwxyz0123456789
+github_token = ghp_1234567890abcdefghijklmnopqrstuvwxyz
 stripe_key = sk_live_abcdefghijklmnopqrstuvwx
+azure_secret = 8Q~abcdefghijklmnopqrstuvwxyz1234567890
+azure_client_id = 12345678-abcd-1234-abcd-123456789abc
 jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U
 password = SuperSecretPassword123
 api_key = "my_secret_api_key_1234567890123456"

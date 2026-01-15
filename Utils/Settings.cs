@@ -57,6 +57,14 @@ namespace SecretsFinder.Utils
         [Description("Enable Heroku API Key detection"),
             Category("Cloud Patterns"), DefaultValue(true)]
         public bool pattern_heroku_api_key { get; set; }
+
+        [Description("Enable Azure Client Secret detection (Entra ID app passwords)"),
+            Category("Cloud Patterns"), DefaultValue(true)]
+        public bool pattern_azure_client_secret { get; set; }
+
+        [Description("Enable Azure GUID detection (Client ID, Tenant ID, Secret ID)"),
+            Category("Cloud Patterns"), DefaultValue(true)]
+        public bool pattern_azure_client_id { get; set; }
         #endregion
 
         #region PATTERNS_SERVICES
@@ -133,6 +141,10 @@ namespace SecretsFinder.Utils
         [Description("Enable Basic Auth detection"),
             Category("Generic Patterns"), DefaultValue(true)]
         public bool pattern_basic_auth { get; set; }
+
+        [Description("Enable High Entropy String detection (potential secrets, may have false positives)"),
+            Category("Generic Patterns"), DefaultValue(false)]
+        public bool pattern_high_entropy_string { get; set; }
         #endregion
 
         #region CUSTOM_PATTERNS

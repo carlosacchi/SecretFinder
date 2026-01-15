@@ -213,6 +213,27 @@ namespace SecretsFinder.Core
                 @"https://[a-z0-9-]+\.firebaseio\.com",
                 SecretSeverity.Medium,
                 "Firebase Database URL"
+            ),
+            new SecretPattern(
+                "azure_client_secret",
+                "Azure Client Secret",
+                @"[a-zA-Z0-9~_\.\-]{34,40}",
+                SecretSeverity.High,
+                "Azure/Entra ID Client Secret (app password)"
+            ),
+            new SecretPattern(
+                "azure_client_id",
+                "Azure Client/Secret ID",
+                @"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+                SecretSeverity.Medium,
+                "Azure GUID (Client ID, Secret ID, Tenant ID)"
+            ),
+            new SecretPattern(
+                "high_entropy_string",
+                "High Entropy String",
+                @"[a-zA-Z0-9~_\-]{20,}[a-zA-Z0-9]",
+                SecretSeverity.Low,
+                "Potential secret - high entropy string"
             )
         };
     }
