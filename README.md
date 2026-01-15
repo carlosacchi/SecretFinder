@@ -154,6 +154,20 @@ Use **Scan All Open Documents** to check all open tabs at once:
 | Generic API Key | `api_key = "..."` |
 | High Entropy String | `Random-looking 20+ char strings` (disabled by default) |
 
+### Cryptocurrency Wallets
+| Secret Type | Example Pattern |
+|-------------|-----------------|
+| Bitcoin Private Key | `5Kb8kLf9zgWQn...` (WIF format) |
+| Bitcoin Address | `1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa` or `bc1q...` |
+| Ethereum Private Key | `0x1234567890abcdef...` (64 hex chars) |
+| Ethereum Address | `0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb` |
+| Crypto Seed Phrase | `seed = "word1 word2 word3..."` (12-24 words) |
+| Wallet Password | `wallet_password = "..."` |
+| Litecoin Address | `LTC address starting with L, M, or 3` |
+| Dogecoin Address | `DOGE address starting with D` |
+| Ripple Secret Key | `sXXXXXXXXXXXXXXXXXXXXXXXXXXX` |
+| Monero Address | `4XXXXXXXXXXXXXXX...` (95 chars) |
+
 ---
 
 ## Settings
@@ -171,6 +185,7 @@ Enable/disable individual pattern types:
 - Cloud: AWS, Google, Azure (Storage, SAS, Client Secrets, GUIDs), Firebase, Heroku
 - Services: GitHub, Stripe, Slack, Discord, Twilio, SendGrid, Mailchimp, NPM, NuGet
 - Generic: JWT, Private Keys, Connection Strings, Bearer/Basic Auth, High Entropy Strings
+- Crypto: Bitcoin (Private Keys, Addresses), Ethereum (Private Keys, Addresses), Litecoin, Dogecoin, Ripple, Monero, Seed Phrases, Wallet Passwords
 
 ### Display
 - `highlight_color` - Color for highlighting secrets (default: `#FF6B6B`)
@@ -209,6 +224,14 @@ azure_client_id = 12345678-abcd-1234-abcd-123456789abc
 jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U
 password = SuperSecretPassword123
 api_key = "my_secret_api_key_1234567890123456"
+
+# Cryptocurrency examples
+bitcoin_address = 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+ethereum_address = 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb
+bitcoin_private_key = 5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss
+ethereum_private_key = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+wallet_password = MyWalletPassword123!
+seed_phrase = abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about
 ```
 
 Press `Ctrl+Alt+S` - all secrets should be highlighted!

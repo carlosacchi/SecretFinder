@@ -248,6 +248,76 @@ namespace SecretsFinder.Core
                 @"[a-zA-Z0-9+/~_\-\.]{12,}",
                 SecretSeverity.Low,
                 "High entropy string (12+ chars)"
+            ),
+            new SecretPattern(
+                "bitcoin_private_key_wif",
+                "Bitcoin Private Key (WIF)",
+                @"\b[5KL][1-9A-HJ-NP-Za-km-z]{50,51}\b",
+                SecretSeverity.Critical,
+                "Bitcoin Private Key in Wallet Import Format"
+            ),
+            new SecretPattern(
+                "bitcoin_address",
+                "Bitcoin Address",
+                @"\b(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b",
+                SecretSeverity.Medium,
+                "Bitcoin wallet address (P2PKH, P2SH, Bech32)"
+            ),
+            new SecretPattern(
+                "ethereum_private_key",
+                "Ethereum Private Key",
+                @"\b(0x)?[a-fA-F0-9]{64}\b",
+                SecretSeverity.Critical,
+                "Ethereum private key (64 hex chars)"
+            ),
+            new SecretPattern(
+                "ethereum_address",
+                "Ethereum Address",
+                @"\b0x[a-fA-F0-9]{40}\b",
+                SecretSeverity.Medium,
+                "Ethereum wallet address"
+            ),
+            new SecretPattern(
+                "crypto_seed_phrase",
+                "Crypto Seed Phrase",
+                @"(?i)\b(seed|mnemonic|recovery|phrase)[\s]*[=:]\s*[""']?([a-z]+\s+){11,23}[a-z]+[""']?",
+                SecretSeverity.Critical,
+                "Cryptocurrency seed/recovery phrase (12-24 words)"
+            ),
+            new SecretPattern(
+                "wallet_password",
+                "Wallet Password",
+                @"(?i)\b(wallet[_\-]?password|wallet[_\-]?pass|keystore[_\-]?password)[\s]*[=:][\s]*['""']?([a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':\\|,.<>\/?]{6,})['""']?",
+                SecretSeverity.Critical,
+                "Cryptocurrency wallet password"
+            ),
+            new SecretPattern(
+                "litecoin_address",
+                "Litecoin Address",
+                @"\b[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}\b",
+                SecretSeverity.Medium,
+                "Litecoin wallet address"
+            ),
+            new SecretPattern(
+                "dogecoin_address",
+                "Dogecoin Address",
+                @"\bD[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32}\b",
+                SecretSeverity.Medium,
+                "Dogecoin wallet address"
+            ),
+            new SecretPattern(
+                "ripple_secret_key",
+                "Ripple Secret Key",
+                @"\bs[a-zA-Z0-9]{28,29}\b",
+                SecretSeverity.Critical,
+                "Ripple (XRP) secret key"
+            ),
+            new SecretPattern(
+                "monero_address",
+                "Monero Address",
+                @"\b4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}\b",
+                SecretSeverity.Medium,
+                "Monero wallet address"
             )
         };
     }
