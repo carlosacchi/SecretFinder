@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+release/
+packages/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+
+# Release artifacts
+*.zip
+
+# Claude
+.claude/
