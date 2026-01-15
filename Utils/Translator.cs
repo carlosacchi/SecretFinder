@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
-using NppDemo.JSON_Tools;
+using SecretsFinder.JSON_Tools;
 using Kbg.NppPluginNET;
 using Kbg.NppPluginNET.PluginInfrastructure;
 using System.Reflection;
@@ -12,7 +12,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace NppDemo.Utils
+namespace SecretsFinder.Utils
 {
     public static class Translator
     {

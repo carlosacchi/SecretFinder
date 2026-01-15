@@ -1,8 +1,8 @@
-﻿using NppDemo.PluginInfrastructure;
+﻿using Kbg.NppPluginNET.PluginInfrastructure;
 using Kbg.NppPluginNET;
 using System.Windows.Forms;
 
-namespace NppDemo.Utils
+namespace SecretsFinder.Utils
 {
     /// <summary>
     /// This class listens to messages that are not broadcast by the plugins manager (e.g., Notepad++ internal messages).<br></br>

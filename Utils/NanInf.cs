@@ -1,4 +1,4 @@
-﻿namespace NppDemo.Utils
+﻿namespace SecretsFinder.Utils
 {
     public class NanInf
     {

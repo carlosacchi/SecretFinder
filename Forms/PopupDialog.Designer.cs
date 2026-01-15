@@ -1,4 +1,4 @@
-﻿namespace NppDemo.Forms
+﻿namespace SecretsFinder.Forms
 {
     partial class PopupDialog
     {

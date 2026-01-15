@@ -1,4 +1,4 @@
-﻿using NppDemo.Utils;
+﻿using SecretsFinder.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using Kbg.NppPluginNET;
 using System.IO;
 
-namespace NppDemo.Forms
+namespace SecretsFinder.Forms
 {
     public partial class SelectionRememberingForm : FormBase
     {

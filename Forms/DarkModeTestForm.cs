@@ -1,8 +1,8 @@
 ﻿using System.Windows.Forms;
 using Kbg.NppPluginNET;
-using NppDemo.Utils;
+using SecretsFinder.Utils;
 
-namespace NppDemo.Forms
+namespace SecretsFinder.Forms
 {
     public partial class DarkModeTestForm : FormBase
     {

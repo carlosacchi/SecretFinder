@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using NppDemo.PluginInfrastructure;
-using NppDemo.Utils;
+using Kbg.NppPluginNET.PluginInfrastructure;
+using SecretsFinder.Utils;
 
 namespace Kbg.NppPluginNET.PluginInfrastructure
 {

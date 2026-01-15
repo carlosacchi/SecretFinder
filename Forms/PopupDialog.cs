@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using ExampleDependency;
 
-namespace NppDemo.Forms
+namespace SecretsFinder.Forms
 {
     public partial class PopupDialog : FormBase
     {

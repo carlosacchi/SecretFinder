@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using NppDemo.JSON_Tools;
+using SecretsFinder.JSON_Tools;
 
-namespace NppDemo.Utils
+namespace SecretsFinder.Utils
 {
     public class SelectionManager
     {
