@@ -45,7 +45,7 @@ namespace SecretsFinder.Forms
             this.VersionLabel.AutoSize = true;
             this.VersionLabel.Location = new Point(22, 50);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Text = "Version 1.0.14";
+            this.VersionLabel.Text = "Version 1.0.15";
             this.VersionLabel.ForeColor = Color.Gray;
 
             // DescriptionLabel

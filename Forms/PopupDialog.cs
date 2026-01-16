@@ -3,6 +3,7 @@ using ExampleDependency;
 
 namespace SecretsFinder.Forms
 {
+    // NOT USED: Example dialog - kept for reference
     public partial class PopupDialog : FormBase
     {
         public PopupDialog() : base(true, false)

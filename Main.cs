@@ -18,7 +18,7 @@ namespace SecretsFinder
         #region Fields
         internal const string PluginName = "SecretsFinder";
         public static readonly string PluginConfigDirectory = Path.Combine(Npp.notepad.GetConfigDirectory(), PluginName);
-        public const string PluginRepository = "https://github.com/carlosacchi/SecretsFinder";
+        public const string PluginRepository = "https://github.com/carlosacchi/SecretFinder";
 
         public static Settings settings = new Settings();
         private static IndicatorManager indicatorManager = new IndicatorManager();
@@ -27,6 +27,7 @@ namespace SecretsFinder
         // Forms
         public static ResultsPanel resultsPanel = null;
         private static Icon dockingFormIcon = null;
+        private static IntPtr dockingFormIconHandle = IntPtr.Zero;
 
         // Menu item IDs
         static internal int IdScanCurrent = 0;
@@ -95,6 +96,9 @@ namespace SecretsFinder
                         PluginBase._funcItems.Items[IdScanCurrent]._cmdID, pTbIcons);
 
                     Marshal.FreeHGlobal(pTbIcons);
+
+                    // Clean up GDI handle to prevent leak
+                    Win32.DeleteObject(tbIcons.hToolbarBmp);
                 }
             }
         }
@@ -183,7 +187,15 @@ namespace SecretsFinder
 
         public static void ScanCurrentDocument()
         {
-            string text = Npp.editor.GetText((int)Npp.editor.GetLength() + 1);
+            // Use long to prevent integer overflow on large files
+            long length = Npp.editor.GetLength();
+            if (length > int.MaxValue - 1)
+            {
+                MessageBox.Show("Document is too large to scan (>2GB).",
+                    "SecretsFinder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string text = Npp.editor.GetText((int)length + 1);
             if (string.IsNullOrEmpty(text))
             {
                 MessageBox.Show("No text to scan in current document.",
@@ -203,12 +215,13 @@ namespace SecretsFinder
             indicatorManager.SetupIndicatorStyle(settings.GetHighlightColor());
             indicatorManager.HighlightMatches(matches);
 
+            // Always update results panel to clear stale results
+            EnsureResultsPanelVisible();
+            resultsPanel.UpdateResults(currentMatches);
+
             // Show/update results panel
             if (matches.Count > 0)
             {
-                EnsureResultsPanelVisible();
-                resultsPanel.UpdateResults(currentMatches);
-
                 MessageBox.Show(
                     $"Found {matches.Count} potential secret(s) in the current document.\n\n" +
                     "Double-click a result in the panel to navigate to it.",
@@ -230,7 +243,11 @@ namespace SecretsFinder
         {
             try
             {
-                string text = Npp.editor.GetText((int)Npp.editor.GetLength() + 1);
+                long length = Npp.editor.GetLength();
+                if (length > int.MaxValue - 1)
+                    return; // Silently skip files that are too large
+
+                string text = Npp.editor.GetText((int)length + 1);
                 if (string.IsNullOrEmpty(text))
                     return;
 
@@ -238,20 +255,21 @@ namespace SecretsFinder
                 var scanner = new SecretScanner(settings.GetEnabledPatterns());
                 var matches = scanner.ScanText(text, filePath);
 
+                // Always update current matches to clear stale results
+                currentMatches.RemoveAll(m => string.Equals(m.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
+                currentMatches.AddRange(matches);
+
+                indicatorManager.SetupIndicatorStyle(settings.GetHighlightColor());
+                indicatorManager.HighlightMatches(matches);
+
+                // Always update results panel if visible to clear stale results
+                if (resultsPanel != null && resultsPanel.Visible)
+                {
+                    resultsPanel.UpdateResults(currentMatches);
+                }
+
                 if (matches.Count > 0)
                 {
-                    // Update current matches
-                    currentMatches.RemoveAll(m => string.Equals(m.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
-                    currentMatches.AddRange(matches);
-
-                    indicatorManager.SetupIndicatorStyle(settings.GetHighlightColor());
-                    indicatorManager.HighlightMatches(matches);
-
-                    // Update results panel if visible
-                    if (resultsPanel != null && resultsPanel.Visible)
-                    {
-                        resultsPanel.UpdateResults(currentMatches);
-                    }
 
                     if (settings.show_auto_scan_notification)
                     {
@@ -287,7 +305,11 @@ namespace SecretsFinder
                     Npp.notepad.ActivateFile(filePath);
                     Npp.editor = new ScintillaGateway(PluginBase.GetCurrentScintilla());
 
-                    string content = Npp.editor.GetText((int)Npp.editor.GetLength() + 1);
+                    long length = Npp.editor.GetLength();
+                    if (length > int.MaxValue - 1)
+                        continue; // Skip files that are too large
+
+                    string content = Npp.editor.GetText((int)length + 1);
                     if (string.IsNullOrEmpty(content))
                         continue;
 
@@ -319,11 +341,12 @@ namespace SecretsFinder
             indicatorManager.SetupIndicatorStyle(settings.GetHighlightColor());
             indicatorManager.HighlightMatchesForCurrentFile(allMatches, currentFile);
 
+            // Always update results panel to clear stale results
+            EnsureResultsPanelVisible();
+            resultsPanel.UpdateResults(allMatches);
+
             if (allMatches.Count > 0)
             {
-                EnsureResultsPanelVisible();
-                resultsPanel.UpdateResults(allMatches);
-
                 int filesWithSecrets = allMatches.Select(m => m.FilePath).Distinct().Count();
                 MessageBox.Show(
                     $"Found {allMatches.Count} potential secret(s) across {filesWithSecrets} file(s)\n" +
@@ -363,11 +386,12 @@ namespace SecretsFinder
             var scanner = new SecretScanner(settings.GetEnabledPatterns());
             var allMatches = scanner.ScanDirectory(backupPath);
 
+            // Always update results panel to clear stale results
+            EnsureResultsPanelVisible();
+            resultsPanel.UpdateResults(allMatches);
+
             if (allMatches.Count > 0)
             {
-                EnsureResultsPanelVisible();
-                resultsPanel.UpdateResults(allMatches);
-
                 int filesWithSecrets = allMatches.Select(m => m.FilePath).Distinct().Count();
                 MessageBox.Show(
                     $"Found {allMatches.Count} potential secret(s) in {filesWithSecrets} backup file(s)!\n\n" +
@@ -416,9 +440,17 @@ namespace SecretsFinder
 
         private static void DisplayResultsPanel(ResultsPanel form)
         {
+            // Clean up previous icon handle if it exists
+            if (dockingFormIconHandle != IntPtr.Zero)
+            {
+                Win32.DestroyIcon(dockingFormIconHandle);
+                dockingFormIconHandle = IntPtr.Zero;
+            }
+
             using (Bitmap newBmp = CreateScanIcon(false))
             {
-                dockingFormIcon = Icon.FromHandle(newBmp.GetHicon());
+                dockingFormIconHandle = newBmp.GetHicon();
+                dockingFormIcon = Icon.FromHandle(dockingFormIconHandle);
             }
 
             NppTbData nppTbData = new NppTbData();

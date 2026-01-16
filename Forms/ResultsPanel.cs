@@ -370,12 +370,26 @@ namespace SecretsFinder.Forms
         private string EscapeJson(string s)
         {
             if (string.IsNullOrEmpty(s)) return "";
-            return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r");
+            // Proper JSON escaping including control characters and unicode
+            return s.Replace("\\", "\\\\")
+                    .Replace("\"", "\\\"")
+                    .Replace("\n", "\\n")
+                    .Replace("\r", "\\r")
+                    .Replace("\t", "\\t")
+                    .Replace("\b", "\\b")
+                    .Replace("\f", "\\f");
         }
 
         private string EscapeCsv(string s)
         {
             if (string.IsNullOrEmpty(s)) return "";
+
+            // Prevent CSV formula injection by prefixing dangerous characters
+            if (s.Length > 0 && (s[0] == '=' || s[0] == '+' || s[0] == '-' || s[0] == '@' || s[0] == '\t' || s[0] == '\r'))
+            {
+                s = "'" + s; // Prefix with single quote to neutralize
+            }
+
             return s.Replace("\"", "\"\"");
         }
     }

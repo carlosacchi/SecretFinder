@@ -4,6 +4,7 @@ using SecretsFinder.Utils;
 
 namespace SecretsFinder.Forms
 {
+    // NOT USED: Testing artifact - kept for reference
     public partial class DarkModeTestForm : FormBase
     {
         private SelectionRememberingForm selectionRememberingForm;

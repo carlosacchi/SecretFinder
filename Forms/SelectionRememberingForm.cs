@@ -9,6 +9,7 @@ using System.IO;
 
 namespace SecretsFinder.Forms
 {
+    // NOT USED: Legacy form code - kept for reference
     public partial class SelectionRememberingForm : FormBase
     {
         public DarkModeTestForm darkModeTestForm;

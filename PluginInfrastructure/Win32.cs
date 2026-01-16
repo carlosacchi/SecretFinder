@@ -439,6 +439,20 @@ namespace Kbg.NppPluginNET.PluginInfrastructure
         public static extern void OutputDebugString(string lpOutputString);
 
         /// <summary>
+        /// Delete a GDI object (bitmap, pen, brush, font, etc.)
+        /// @see https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject
+        /// </summary>
+        [DllImport("gdi32")]
+        public static extern bool DeleteObject(IntPtr hObject);
+
+        /// <summary>
+        /// Destroy an icon and free memory occupied by it
+        /// @see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroyicon
+        /// </summary>
+        [DllImport("user32")]
+        public static extern bool DestroyIcon(IntPtr hIcon);
+
+        /// <summary>
         /// @see https://msdn.microsoft.com/en-us/library/windows/desktop/bb787583(v=vs.85).aspx
         /// </summary>
         /// <param name="hwnd"></param>

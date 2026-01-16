@@ -20,8 +20,10 @@ namespace SecretsFinder.Core
                 {
                     try
                     {
+                        // Add timeout to prevent regex DoS attacks
                         pattern.CompiledRegex = new Regex(pattern.Pattern,
-                            RegexOptions.Compiled | RegexOptions.Multiline);
+                            RegexOptions.Compiled | RegexOptions.Multiline,
+                            TimeSpan.FromSeconds(2));
                     }
                     catch (ArgumentException)
                     {

@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 
 namespace SecretsFinder.Utils
 {
+    // NOT USED: Internationalization placeholder - kept for future use
     public static class Translator
     {
         private static JObject translations = null;

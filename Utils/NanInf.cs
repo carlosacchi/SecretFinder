@@ -1,5 +1,6 @@
 ﻿namespace SecretsFinder.Utils
 {
+    // NOT USED: Math utility for NaN/Inf handling - kept for reference
     public class NanInf
     {
         /// <summary>

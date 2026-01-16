@@ -4,6 +4,7 @@ using System.Windows.Forms;
 
 namespace SecretsFinder.Utils
 {
+    // NOT USED: Message listener infrastructure - kept for future use
     /// <summary>
     /// This class listens to messages that are not broadcast by the plugins manager (e.g., Notepad++ internal messages).<br></br>
     /// The original idea comes from Peter Frentrup's NppMenuSearch plugin (https://github.com/search?q=repo%3Apeter-frentrup%2FNppMenuSearch%20NppListener&type=code)
